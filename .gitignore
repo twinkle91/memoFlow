@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Next.js and generated output
+.next/
+/out/
+/build/
+/dist/
+storybook-static/
+coverage/
+*.tsbuildinfo
+
+# Local environment and runtime data
+.env*
+!.env.example
+/data/db.json
+
+# Logs and OS files
+*.log
+.DS_Store
