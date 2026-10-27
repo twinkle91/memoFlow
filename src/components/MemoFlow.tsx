@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { makeSearchShortcutHandler } from "@/lib/keyboard-shortcut";
 import {
   type ActionItem,
   type Note,
@@ -42,6 +43,7 @@ export function MemoFlow({
   const [updating, setUpdating] = useState<string[]>([]);
   const dialog = useRef<HTMLDialogElement>(null);
   const noteTitle = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const query = search.trim().toLowerCase();
   const visibleNotes = notes.filter((note) =>
     `${note.title} ${note.body}`.toLowerCase().includes(query),
@@ -58,6 +60,17 @@ export function MemoFlow({
       noteTitle.current?.focus();
     } else dialog.current?.close();
   }, [composing]);
+
+  useEffect(() => {
+    const handler = makeSearchShortcutHandler({
+      getSearchElement: () => searchInputRef.current,
+      getActiveElement: () => document.activeElement,
+    });
+    document.addEventListener("keydown", handler);
+    return () => {
+      document.removeEventListener("keydown", handler);
+    };
+  }, []);
 
   function toggleItem(id: string) {
     setSelected((current) => {
@@ -265,6 +278,7 @@ export function MemoFlow({
           <div className="search-bar">
             <Icon name="search" size={18} />
             <input
+              ref={searchInputRef}
               type="search"
               aria-label="Search notes and action items"
               placeholder="Find a note, an idea, a next step…"
@@ -329,7 +343,7 @@ export function MemoFlow({
               )}
               {visibleNotes.length === 0 && query && (
                 <p className="empty-state">
-                  No notes match “{search}”. Try another search.
+                  No notes match "{search}". Try another search.
                 </p>
               )}
             </div>
