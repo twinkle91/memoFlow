@@ -429,7 +429,7 @@ export function MemoFlow({
                             onChange={() => toggleItem(item.id)}
                           />
                         </td>
-                        <td className="item-title">
+                        <td className="item-title whitespace-pre-line">
                           <span className="item-reference">
                             {item.id.replace("item-", "ACT-00")}
                           </span>
