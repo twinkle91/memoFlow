@@ -38,4 +38,58 @@ describe("selected workspace CSV", () => {
       ),
     ).toBe(`${CSV_HEADER}\r\n`);
   });
+  it("exports a title with embedded newlines correctly quoted", () => {
+    const items: ActionItem[] = [
+      {
+        id: "item-ml",
+        workspace_id: "team-alpha",
+        title: "Line1\nLine2",
+        owner: "Alice",
+        status: "To do",
+      },
+    ];
+    const csv = formatActionItemsCsv(items, ["item-ml"], "team-alpha");
+    expect(csv).toContain('"Line1\nLine2"');
+    expect(csv).toMatch(/^id,title,owner,status,workspace_id\r\n/);
+  });
+  it("exports a title with CRLF embedded newlines correctly quoted", () => {
+    const items: ActionItem[] = [
+      {
+        id: "item-crlf",
+        workspace_id: "team-alpha",
+        title: "First\r\nSecond",
+        owner: "Bob",
+        status: "To do",
+      },
+    ];
+    const csv = formatActionItemsCsv(items, ["item-crlf"], "team-alpha");
+    expect(csv).toContain('"First\r\nSecond"');
+  });
+  it("long single-line title is exported without truncation", () => {
+    const longTitle = "A".repeat(180);
+    const items: ActionItem[] = [
+      {
+        id: "item-long",
+        workspace_id: "team-alpha",
+        title: longTitle,
+        owner: "Carol",
+        status: "Done",
+      },
+    ];
+    const csv = formatActionItemsCsv(items, ["item-long"], "team-alpha");
+    expect(csv).toContain(longTitle);
+  });
+  it("single-line titles remain unquoted when no special chars", () => {
+    const items: ActionItem[] = [
+      {
+        id: "item-plain",
+        workspace_id: "team-alpha",
+        title: "Simple title",
+        owner: "Dave",
+        status: "Done",
+      },
+    ];
+    const csv = formatActionItemsCsv(items, ["item-plain"], "team-alpha");
+    expect(csv).toContain("item-plain,Simple title,Dave,Done,team-alpha");
+  });
 });

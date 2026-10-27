@@ -251,4 +251,31 @@ describe("MemoFlow API and persistence", () => {
     vi.stubEnv("GIT_COMMIT_SHA", "abcdef1234");
     expect(await getBuildId().json()).toEqual({ commitSha: "abcdef1234" });
   });
+
+  it("GET action items preserves embedded newlines in title", async () => {
+    const response = await getItems(
+      new Request("http://localhost/api/action-items"),
+    );
+    expect(response.status).toBe(200);
+    const { items } = await response.json();
+    const item2 = items.find((item: { id: string }) => item.id === "item-2");
+    expect(item2).toBeDefined();
+    expect(item2.title).toContain("\n");
+    expect(item2.title).toBe("Update Q4 roadmap,\nmetrics, and goals");
+  });
+
+  it("POST /api/export-csv with multiline title returns valid RFC 4180 CSV", async () => {
+    const response = await exportCsv(
+      post("/api/export-csv", {
+        selectedIds: ["item-2"],
+        currentWorkspaceId: "team-alpha",
+      }),
+    );
+    expect(response.status).toBe(200);
+    const csv = await response.text();
+    // Multiline title must be wrapped in double quotes per RFC 4180
+    expect(csv).toContain('"Update Q4 roadmap,\nmetrics, and goals"');
+    // The newline is preserved inside the quoted field
+    expect(csv).toMatch(/"Update Q4 roadmap,\nmetrics, and goals"/);
+  });
 });
