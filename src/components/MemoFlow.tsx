@@ -10,6 +10,7 @@ import {
   WORKSPACE_ID,
 } from "@/lib/types";
 import { ExportCsvButton } from "./ExportCsvButton";
+import { GreetingBox } from "./GreetingBox";
 import { Icon } from "./Icon";
 import { NoteCard } from "./NoteCard";
 
@@ -211,6 +212,7 @@ export function MemoFlow({
           </span>
         </header>
         <main id="overview">
+          <GreetingBox />
           <div className="page-heading">
             <div>
               <p className="eyebrow">THINK CLEARLY. MOVE FORWARD.</p>
